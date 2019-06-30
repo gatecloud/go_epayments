@@ -90,7 +90,7 @@ func (e *Config) Sign(sig Signaturer) error {
 	sig.SetSignature(fmt.Sprintf("%x", h.Sum(nil)))
 	sig.SetSignType("MD5")
 
-	return validate.Struct(sig)
+	return validate.Struct(*sig)
 }
 
 func ToURLParams(sig Signaturer) (string, error) {
