@@ -38,7 +38,8 @@ func (e *MiniProgram) Do(cfg Config) (Response, int, error) {
 		return response, http.StatusInternalServerError, err
 	}
 
-	statusCode, err := DoRequest("GET", cfg.Endpoint, nil, &response)
+	url := cfg.Endpoint + "?" + parameters
+	statusCode, err := DoRequest("GET", url, nil, &response)
 	if err != nil {
 		return response, statusCode, err
 	}

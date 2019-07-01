@@ -26,7 +26,7 @@ func (e *Config) Sign(sig Signaturer) error {
 	)
 
 	// Validate if the fields are null
-	config := &validator.Config{
+	config := validator.Config{
 		TagName: "validate",
 	}
 
@@ -90,7 +90,7 @@ func (e *Config) Sign(sig Signaturer) error {
 	sig.SetSignature(fmt.Sprintf("%x", h.Sum(nil)))
 	sig.SetSignType("MD5")
 
-	return validate.Struct(*sig)
+	return validate.Struct(sig)
 }
 
 func ToURLParams(sig Signaturer) (string, error) {
