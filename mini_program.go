@@ -25,9 +25,7 @@ type MiniProgram struct {
 }
 
 func (e *MiniProgram) Do(cfg Config) (Response, int, error) {
-	var (
-		response Response
-	)
+	var response Response
 
 	if err := cfg.Sign(e); err != nil {
 		return response, http.StatusInternalServerError, err
