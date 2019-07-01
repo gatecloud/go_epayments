@@ -26,7 +26,6 @@ type MiniProgram struct {
 
 func (e *MiniProgram) Do(cfg Config) (Response, int, error) {
 	var response Response
-
 	if err := cfg.Sign(e); err != nil {
 		return response, http.StatusInternalServerError, err
 	}
@@ -40,6 +39,10 @@ func (e *MiniProgram) Do(cfg Config) (Response, int, error) {
 	statusCode, err := DoRequest("GET", url, nil, &response)
 	if err != nil {
 		return response, statusCode, err
+	}
+
+	if err := cfg.Verify(&response); err != nil {
+		return response, http.StatusInternalServerError, err
 	}
 
 	statusCode, err = response.Validate()

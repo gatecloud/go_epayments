@@ -30,6 +30,10 @@ func (e *TradeQuery) Do(cfg Config) (TradeQueryResponse, int, error) {
 		return response, statusCode, err
 	}
 
+	if err := cfg.Verify(&response); err != nil {
+		return response, http.StatusInternalServerError, err
+	}
+
 	statusCode, err = response.Validate()
 	if err != nil {
 		return response, statusCode, err

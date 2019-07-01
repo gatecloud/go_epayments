@@ -10,3 +10,7 @@ type RefundResponse struct {
 	Signature     string `json:"signature"`
 	SignType      string `json:"sign_type"`
 }
+
+func (e *RefundResponse) GetSignature() string {
+	return e.Signature
+}

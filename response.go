@@ -9,3 +9,7 @@ type Response struct {
 	Signature   string `json:"signature"`
 	SignType    string `json:"sign_type"`
 }
+
+func (e *Response) GetSignature() string {
+	return e.Signature
+}

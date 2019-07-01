@@ -14,3 +14,7 @@ type RefundQueryResponse struct {
 	NonceStr        string  `json:"nonce_str"`
 	Signature       string  `json:"signature"`
 }
+
+func (e *RefundQueryResponse) GetSignature() string {
+	return e.Signature
+}

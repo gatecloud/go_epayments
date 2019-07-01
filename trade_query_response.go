@@ -16,3 +16,7 @@ type TradeQueryResponse struct {
 	Signature       string  `json:"signature"`
 	SignType        string  `json:"sign_type"`
 }
+
+func (e *TradeQueryResponse) GetSignature() string {
+	return e.Signature
+}

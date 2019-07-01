@@ -35,6 +35,10 @@ func (e *Refund) Do(cfg Config) (RefundResponse, int, error) {
 		return response, statusCode, err
 	}
 
+	if err := cfg.Verify(&response); err != nil {
+		return response, http.StatusInternalServerError, err
+	}
+
 	statusCode, err = response.Validate()
 	if err != nil {
 		return response, statusCode, err
