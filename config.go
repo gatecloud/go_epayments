@@ -165,6 +165,10 @@ func scan(i interface{}, m map[string]string) error {
 		return errors.New("reflect error")
 	}
 
+	if val.Kind() == reflect.Ptr {
+		val = val.Elem()
+	}
+
 	for i := 0; i < val.NumField(); i++ {
 		tag := val.Type().Field(i).Tag.Get("json")
 		if tag != "signature" && tag != "sign_type" {
