@@ -106,15 +106,15 @@ func (e *Config) Verify(ver Verifier) (int, error) {
 	)
 
 	// Sort the fields
-	rfPayment := reflect.ValueOf(ver).Elem()
-	if !rfPayment.IsValid() {
+	val := reflect.ValueOf(ver).Elem()
+	if !val.IsValid() {
 		return http.StatusInternalServerError, errors.New("reflect error")
 	}
 
-	for i := 0; i < rfPayment.NumField(); i++ {
-		tag := rfPayment.Type().Field(i).Tag.Get("json")
+	for i := 0; i < val.NumField(); i++ {
+		tag := val.Type().Field(i).Tag.Get("json")
 		if tag != "signature" && tag != "sign_type" {
-			p := rfPayment.Field(i)
+			p := val.Field(i)
 			// Check if the value is 0, null or ""
 			if reflect.DeepEqual(p.Interface(), reflect.Zero(reflect.TypeOf(p.Interface())).Interface()) {
 				continue
@@ -122,14 +122,36 @@ func (e *Config) Verify(ver Verifier) (int, error) {
 			fmt.Println("=====", tag)
 			switch p.Kind() {
 			case reflect.String:
-				s := rfPayment.Field(i).String()
+				s := val.Field(i).String()
 				paymentMap[tag] = s
 			case reflect.Float64:
-				f := rfPayment.Field(i).Float()
+				f := val.Field(i).Float()
 				paymentMap[tag] = fmt.Sprintf("%.2f", f)
 			case reflect.Int64:
-				f := rfPayment.Field(i).Int()
+				f := val.Field(i).Int()
 				paymentMap[tag] = fmt.Sprintf("%d", f)
+			case reflect.Struct:
+				childVal := reflect.ValueOf(val.Field(i).Interface())
+				for j := 0; j < childVal.NumField(); j++ {
+					childTag := childVal.Type().Field(i).Tag.Get("json")
+					q := childVal.Field(j)
+					// Check if the value is 0, null or ""
+					if reflect.DeepEqual(q.Interface(), reflect.Zero(reflect.TypeOf(q.Interface())).Interface()) {
+						continue
+					}
+					switch q.Kind() {
+					case reflect.String:
+						s := childVal.Field(i).String()
+						paymentMap[childTag] = s
+					case reflect.Float64:
+						f := childVal.Field(i).Float()
+						paymentMap[childTag] = fmt.Sprintf("%.2f", f)
+					case reflect.Int64:
+						f := childVal.Field(i).Int()
+						paymentMap[childTag] = fmt.Sprintf("%d", f)
+					}
+					keys = append(keys, childTag)
+				}
 			}
 			keys = append(keys, tag)
 		}
