@@ -18,6 +18,8 @@ type AsyncResult struct {
 	GmtPayment      string  `form:"gmt_payment" json:"gmt_payment"`
 	TradeStatus     string  `form:"trade_status" json:"trade_status"`
 	PaymentChannels string  `form:"payment_channels" json:"payment_channels"`
+	Rate            string  `form:"rate" json:"rate"`
+	OpenID          string  `form:"openid" json:"openid"`
 }
 
 func (e *AsyncResult) VerifySignature(cfg Config) (int, error) {
