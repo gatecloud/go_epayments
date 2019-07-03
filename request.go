@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -53,6 +54,7 @@ func DoRequest(method, url string, body []byte, response interface{}) (int, erro
 	if err != nil {
 		return resp.StatusCode, errors.New(resp.Status + "," + string(respBody))
 	}
+	fmt.Println("----", string(respBody))
 
 	err = json.Unmarshal(respBody, response)
 	if err != nil {
