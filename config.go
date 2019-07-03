@@ -37,33 +37,12 @@ func (e *Config) Sign(sig Signaturer) (int, error) {
 	}
 
 	// Sort the fields
-	rfPayment := reflect.ValueOf(sig).Elem()
-	if !rfPayment.IsValid() {
-		return http.StatusInternalServerError, errors.New("reflect error")
+	if err := scan(sig, paymentMap); err != nil {
+		return http.StatusInternalServerError, err
 	}
 
-	for i := 0; i < rfPayment.NumField(); i++ {
-		tag := rfPayment.Type().Field(i).Tag.Get("json")
-		if tag != "signature" && tag != "sign_type" {
-			p := rfPayment.Field(i)
-			// Check if the value is 0, null or ""
-			if reflect.DeepEqual(p.Interface(), reflect.Zero(reflect.TypeOf(p.Interface())).Interface()) {
-				continue
-			}
-			fmt.Println("=====", tag)
-			switch p.Kind() {
-			case reflect.String:
-				s := rfPayment.Field(i).String()
-				paymentMap[tag] = s
-			case reflect.Float64:
-				f := rfPayment.Field(i).Float()
-				paymentMap[tag] = fmt.Sprintf("%.2f", f)
-			case reflect.Int64:
-				f := rfPayment.Field(i).Int()
-				paymentMap[tag] = fmt.Sprintf("%d", f)
-			}
-			keys = append(keys, tag)
-		}
+	for k := range paymentMap {
+		keys = append(keys, k)
 	}
 
 	sort.Strings(keys)
@@ -106,55 +85,12 @@ func (e *Config) Verify(ver Verifier) (int, error) {
 	)
 
 	// Sort the fields
-	val := reflect.ValueOf(ver).Elem()
-	if !val.IsValid() {
-		return http.StatusInternalServerError, errors.New("reflect error")
+	if err := scan(ver, paymentMap); err != nil {
+		return http.StatusInternalServerError, err
 	}
 
-	for i := 0; i < val.NumField(); i++ {
-		tag := val.Type().Field(i).Tag.Get("json")
-		if tag != "signature" && tag != "sign_type" {
-			p := val.Field(i)
-			// Check if the value is 0, null or ""
-			if reflect.DeepEqual(p.Interface(), reflect.Zero(reflect.TypeOf(p.Interface())).Interface()) {
-				continue
-			}
-			fmt.Println("=====", tag)
-			switch p.Kind() {
-			case reflect.String:
-				s := val.Field(i).String()
-				paymentMap[tag] = s
-			case reflect.Float64:
-				f := val.Field(i).Float()
-				paymentMap[tag] = fmt.Sprintf("%.2f", f)
-			case reflect.Int64:
-				f := val.Field(i).Int()
-				paymentMap[tag] = fmt.Sprintf("%d", f)
-			case reflect.Struct:
-				childVal := reflect.ValueOf(val.Field(i).Interface())
-				for j := 0; j < childVal.NumField(); j++ {
-					childTag := childVal.Type().Field(i).Tag.Get("json")
-					q := childVal.Field(j)
-					// Check if the value is 0, null or ""
-					if reflect.DeepEqual(q.Interface(), reflect.Zero(reflect.TypeOf(q.Interface())).Interface()) {
-						continue
-					}
-					switch q.Kind() {
-					case reflect.String:
-						s := childVal.Field(i).String()
-						paymentMap[childTag] = s
-					case reflect.Float64:
-						f := childVal.Field(i).Float()
-						paymentMap[childTag] = fmt.Sprintf("%.2f", f)
-					case reflect.Int64:
-						f := childVal.Field(i).Int()
-						paymentMap[childTag] = fmt.Sprintf("%d", f)
-					}
-					keys = append(keys, childTag)
-				}
-			}
-			keys = append(keys, tag)
-		}
+	for k := range paymentMap {
+		keys = append(keys, k)
 	}
 
 	sort.Strings(keys)
@@ -221,4 +157,40 @@ func EncodeSpecialChar(src string) string {
 	dst = strings.Replace(dst, "+", "%20", -1)
 	dst = strings.Replace(dst, "*", "%2A", -1)
 	return strings.Replace(dst, "%7E", "~", -1)
+}
+
+func scan(i interface{}, m map[string]string) error {
+	val := reflect.ValueOf(i).Elem()
+	if !val.IsValid() {
+		return errors.New("reflect error")
+	}
+
+	for i := 0; i < val.NumField(); i++ {
+		tag := val.Type().Field(i).Tag.Get("json")
+		if tag != "signature" && tag != "sign_type" {
+			p := val.Field(i)
+			// Check if the value is 0, null or ""
+			if reflect.DeepEqual(p.Interface(), reflect.Zero(reflect.TypeOf(p.Interface())).Interface()) {
+				continue
+			}
+			fmt.Println("=====", tag)
+
+			switch p.Kind() {
+			case reflect.String:
+				s := val.Field(i).String()
+				m[tag] = s
+			case reflect.Float64:
+				f := val.Field(i).Float()
+				m[tag] = fmt.Sprintf("%.2f", f)
+			case reflect.Int64:
+				f := val.Field(i).Int()
+				m[tag] = fmt.Sprintf("%d", f)
+			case reflect.Struct:
+				if err := scan(p.Interface(), m); err != nil {
+					return err
+				}
+			}
+		}
+	}
+	return nil
 }

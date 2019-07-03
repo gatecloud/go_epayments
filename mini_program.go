@@ -41,10 +41,6 @@ func (e *MiniProgram) Do(cfg Config) (Response, int, error) {
 		return response, statusCode, err
 	}
 
-	if statusCode, err := cfg.Verify(&response); err != nil {
-		return response, statusCode, err
-	}
-
 	statusCode, err = response.Validate()
 	if err != nil {
 		return response, statusCode, err
