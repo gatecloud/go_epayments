@@ -160,7 +160,7 @@ func EncodeSpecialChar(src string) string {
 }
 
 func scan(i interface{}, m map[string]string) error {
-	val := reflect.ValueOf(i).Elem()
+	val := reflect.ValueOf(i)
 	if !val.IsValid() {
 		return errors.New("reflect error")
 	}
@@ -186,7 +186,7 @@ func scan(i interface{}, m map[string]string) error {
 				f := val.Field(i).Int()
 				m[tag] = fmt.Sprintf("%d", f)
 			case reflect.Struct:
-				if err := scan(p.Interface(), m); err != nil {
+				if err := scan(p, m); err != nil {
 					return err
 				}
 			}
