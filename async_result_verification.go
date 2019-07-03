@@ -3,20 +3,20 @@ package epayments
 import "net/http"
 
 type AsyncResultVerification struct {
-	MerchantID  string `json:"merchant_id"`
-	IncrementID string `json:"increment_id"`
-	NotifyID    string `json:"notify_id"`
-	SignType    string `json:"sign_type"`
-	NonceStr    string `json:"nonce_str"`
-	Signature   string `json:"signature"`
-	Service     string `json:"service"`
+	MerchantID  string `json:"merchant_id" validate:"required"`
+	IncrementID string `json:"increment_id" validate:"required"`
+	NotifyID    string `json:"notify_id" validate:"required"`
+	SignType    string `json:"sign_type" validate:"required"`
+	NonceStr    string `json:"nonce_str" validate:"required"`
+	Signature   string `json:"signature" validate:"required"`
+	Service     string `json:"service" validate:"required"`
 }
 
 func (e *AsyncResultVerification) Do(cfg Config) (int, error) {
 	var errCode ErrorCode
 
-	if err := cfg.Sign(e); err != nil {
-		return http.StatusInternalServerError, err
+	if statusCode, err := cfg.Sign(e); err != nil {
+		return statusCode, err
 	}
 
 	parameters, err := ToURLParams(e)

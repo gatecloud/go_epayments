@@ -16,8 +16,8 @@ type RefundQuery struct {
 
 func (e *RefundQuery) Do(cfg Config) (RefundQueryResponse, int, error) {
 	var response RefundQueryResponse
-	if err := cfg.Sign(e); err != nil {
-		return response, http.StatusInternalServerError, err
+	if statusCode, err := cfg.Sign(e); err != nil {
+		return response, statusCode, err
 	}
 
 	parameters, err := ToURLParams(e)
@@ -32,8 +32,8 @@ func (e *RefundQuery) Do(cfg Config) (RefundQueryResponse, int, error) {
 		return response, statusCode, err
 	}
 
-	if err := cfg.Verify(&response); err != nil {
-		return response, http.StatusInternalServerError, err
+	if statusCode, err := cfg.Verify(&response); err != nil {
+		return response, statusCode, err
 	}
 
 	statusCode, err = response.Validate()

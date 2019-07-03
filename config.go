@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"net/http"
 	"net/url"
 	"reflect"
 	"sort"
@@ -18,7 +19,7 @@ type Config struct {
 	Endpoint string `validate:"required"`
 }
 
-func (e *Config) Sign(sig Signaturer) error {
+func (e *Config) Sign(sig Signaturer) (int, error) {
 	var (
 		keys       []string
 		paymentMap = make(map[string]string)
@@ -32,13 +33,13 @@ func (e *Config) Sign(sig Signaturer) error {
 
 	validate := validator.New(&config)
 	if err := validate.Struct(*e); err != nil {
-		return err
+		return http.StatusBadRequest, err
 	}
 
 	// Sort the fields
 	rfPayment := reflect.ValueOf(sig).Elem()
 	if !rfPayment.IsValid() {
-		return errors.New("reflect error")
+		return http.StatusInternalServerError, errors.New("reflect error")
 	}
 
 	for i := 0; i < rfPayment.NumField(); i++ {
@@ -80,20 +81,24 @@ func (e *Config) Sign(sig Signaturer) error {
 	h := md5.New()
 	n, err := io.WriteString(h, sortedQueryString[1:len(sortedQueryString)])
 	if err != nil {
-		return err
+		return http.StatusInternalServerError, err
 	}
 
 	if n < 0 {
-		return errors.New("Write <= bytes")
+		return http.StatusInternalServerError, errors.New("Write <= bytes")
 	}
 
 	sig.SetSignature(fmt.Sprintf("%x", h.Sum(nil)))
 	sig.SetSignType("MD5")
 
-	return validate.Struct(sig)
+	if err := validate.Struct(sig); err != nil {
+		return http.StatusBadRequest, err
+	}
+
+	return http.StatusOK, nil
 }
 
-func (e *Config) Verify(ver Verifier) error {
+func (e *Config) Verify(ver Verifier) (int, error) {
 	var (
 		keys       []string
 		paymentMap = make(map[string]string)
@@ -103,7 +108,7 @@ func (e *Config) Verify(ver Verifier) error {
 	// Sort the fields
 	rfPayment := reflect.ValueOf(ver).Elem()
 	if !rfPayment.IsValid() {
-		return errors.New("reflect error")
+		return http.StatusInternalServerError, errors.New("reflect error")
 	}
 
 	for i := 0; i < rfPayment.NumField(); i++ {
@@ -145,19 +150,19 @@ func (e *Config) Verify(ver Verifier) error {
 	h := md5.New()
 	n, err := io.WriteString(h, sortedQueryString[1:len(sortedQueryString)])
 	if err != nil {
-		return err
+		return http.StatusInternalServerError, err
 	}
 
 	if n < 0 {
-		return errors.New("Write <= bytes")
+		return http.StatusInternalServerError, errors.New("Write <= bytes")
 	}
 
 	signature := fmt.Sprintf("%x", h.Sum(nil))
 	if ver.GetSignature() != signature {
-		return errors.New("Signature not match")
+		return http.StatusBadRequest, errors.New("Signature not match")
 	}
 
-	return nil
+	return http.StatusOK, nil
 }
 
 func ToURLParams(sig Signaturer) (string, error) {

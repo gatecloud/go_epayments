@@ -9,7 +9,7 @@ type Refund struct {
 	IncrementID   string  `json:"increment_id" validate:"required"`
 	Currency      string  `json:"currency" validate:"required"`
 	RefundFee     float64 `json:"refund_fee" validate:"required"`
-	RefundReason  string  `json:"refund_reason" validate:"max=256"`
+	RefundReason  string  `json:"refund_reason"`
 	RefundTradeNo string  `json:"refund_trade_no"`
 	RefundOrder   string  `json:"refund_order"`
 	SignType      string  `json:"sign_type" validate:"required"`
@@ -20,8 +20,8 @@ type Refund struct {
 
 func (e *Refund) Do(cfg Config) (RefundResponse, int, error) {
 	var response RefundResponse
-	if err := cfg.Sign(e); err != nil {
-		return response, http.StatusInternalServerError, err
+	if statusCode, err := cfg.Sign(e); err != nil {
+		return response, statusCode, err
 	}
 
 	parameters, err := ToURLParams(e)
@@ -35,8 +35,8 @@ func (e *Refund) Do(cfg Config) (RefundResponse, int, error) {
 		return response, statusCode, err
 	}
 
-	if err := cfg.Verify(&response); err != nil {
-		return response, http.StatusInternalServerError, err
+	if statusCode, err := cfg.Verify(&response); err != nil {
+		return response, statusCode, err
 	}
 
 	statusCode, err = response.Validate()

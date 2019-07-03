@@ -15,8 +15,8 @@ type TradeQuery struct {
 
 func (e *TradeQuery) Do(cfg Config) (TradeQueryResponse, int, error) {
 	var response TradeQueryResponse
-	if err := cfg.Sign(e); err != nil {
-		return response, http.StatusInternalServerError, err
+	if statusCode, err := cfg.Sign(e); err != nil {
+		return response, statusCode, err
 	}
 
 	parameters, err := ToURLParams(e)
@@ -30,8 +30,8 @@ func (e *TradeQuery) Do(cfg Config) (TradeQueryResponse, int, error) {
 		return response, statusCode, err
 	}
 
-	if err := cfg.Verify(&response); err != nil {
-		return response, http.StatusInternalServerError, err
+	if statusCode, err := cfg.Verify(&response); err != nil {
+		return response, statusCode, err
 	}
 
 	statusCode, err = response.Validate()
