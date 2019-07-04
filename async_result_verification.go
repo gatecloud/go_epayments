@@ -19,7 +19,7 @@ func (e *AsyncResultVerification) Do(cfg Config) (int, error) {
 		return statusCode, err
 	}
 
-	parameters, err := ToURLParams(e)
+	parameters, err := toURLParams(e)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}

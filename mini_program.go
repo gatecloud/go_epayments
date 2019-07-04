@@ -30,7 +30,7 @@ func (e *MiniProgram) Do(cfg Config) (Response, int, error) {
 		return response, statusCode, err
 	}
 
-	parameters, err := ToURLParams(e)
+	parameters, err := toURLParams(e)
 	if err != nil {
 		return response, http.StatusInternalServerError, err
 	}
@@ -38,6 +38,10 @@ func (e *MiniProgram) Do(cfg Config) (Response, int, error) {
 	url := cfg.Endpoint + "?" + parameters
 	statusCode, err := DoRequest("GET", url, nil, &response)
 	if err != nil {
+		return response, statusCode, err
+	}
+
+	if statusCode, err := cfg.Verify(&response); err != nil {
 		return response, statusCode, err
 	}
 

@@ -116,6 +116,9 @@ func (e *Config) Verify(ver Verifier) (int, error) {
 	}
 
 	signature := fmt.Sprintf("%x", h.Sum(nil))
+
+	fmt.Println("OLD=", signature)
+	fmt.Println("NEW=", ver.GetSignature())
 	if ver.GetSignature() != signature {
 		return http.StatusBadRequest, errors.New("Signature not match")
 	}
@@ -123,7 +126,7 @@ func (e *Config) Verify(ver Verifier) (int, error) {
 	return http.StatusOK, nil
 }
 
-func ToURLParams(sig Signaturer) (string, error) {
+func toURLParams(sig Signaturer) (string, error) {
 	rfPayment := reflect.ValueOf(sig).Elem()
 	if !rfPayment.IsValid() {
 		return "", errors.New("reflect error")
@@ -152,11 +155,15 @@ func ToURLParams(sig Signaturer) (string, error) {
 	return v.Encode(), nil
 }
 
-func EncodeSpecialChar(src string) string {
+func encodeSpecialChar(src string) string {
 	dst := url.QueryEscape(src)
 	dst = strings.Replace(dst, "+", "%20", -1)
 	dst = strings.Replace(dst, "*", "%2A", -1)
 	return strings.Replace(dst, "%7E", "~", -1)
+}
+
+func removeSpecialChar(src string) string {
+	return strings.Replace(src, "\\", "", -1)
 }
 
 func scan(i interface{}, m map[string]string) error {
@@ -169,6 +176,7 @@ func scan(i interface{}, m map[string]string) error {
 		val = val.Elem()
 	}
 
+	fmt.Println("=-=-=-=-", val)
 	for i := 0; i < val.NumField(); i++ {
 		tag := val.Type().Field(i).Tag.Get("json")
 		if tag != "signature" && tag != "sign_type" {
@@ -182,7 +190,7 @@ func scan(i interface{}, m map[string]string) error {
 			switch p.Kind() {
 			case reflect.String:
 				s := val.Field(i).String()
-				m[tag] = s
+				m[tag] = removeSpecialChar(s)
 			case reflect.Float64:
 				f := val.Field(i).Float()
 				m[tag] = fmt.Sprintf("%.2f", f)
@@ -190,7 +198,7 @@ func scan(i interface{}, m map[string]string) error {
 				f := val.Field(i).Int()
 				m[tag] = fmt.Sprintf("%d", f)
 			case reflect.Struct:
-				if err := scan(p, m); err != nil {
+				if err := scan(p.Interface(), m); err != nil {
 					return err
 				}
 			}

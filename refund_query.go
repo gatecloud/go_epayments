@@ -20,7 +20,7 @@ func (e *RefundQuery) Do(cfg Config) (RefundQueryResponse, int, error) {
 		return response, statusCode, err
 	}
 
-	parameters, err := ToURLParams(e)
+	parameters, err := toURLParams(e)
 	if err != nil {
 		return response, http.StatusInternalServerError, err
 	}
@@ -32,9 +32,9 @@ func (e *RefundQuery) Do(cfg Config) (RefundQueryResponse, int, error) {
 		return response, statusCode, err
 	}
 
-	// if statusCode, err := cfg.Verify(&response); err != nil {
-	// 	return response, statusCode, err
-	// }
+	if statusCode, err := cfg.Verify(&response); err != nil {
+		return response, statusCode, err
+	}
 
 	statusCode, err = response.Validate()
 	if err != nil {
