@@ -1,5 +1,7 @@
 package epayments
 
+// Refer to 2.3
+// AsyncResult accepts the asynchronized notification from ePayment
 type AsyncResult struct {
 	NotifyID        string  `form:"notify_id" json:"notify_id"`
 	MerchantID      string  `form:"merchant_id" json:"merchant_id"`

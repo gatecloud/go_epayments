@@ -2,6 +2,8 @@ package epayments
 
 import "net/http"
 
+// Refer to 2.3+
+// AsyncResultVerification is used to verify the asynchronized notifaction
 type AsyncResultVerification struct {
 	MerchantID  string `json:"merchant_id" validate:"required"`
 	IncrementID string `json:"increment_id" validate:"required"`

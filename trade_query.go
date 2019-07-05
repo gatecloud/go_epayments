@@ -4,6 +4,8 @@ import (
 	"net/http"
 )
 
+// Refer to 2.4
+// TradeQuery is used to execute trade query of the paid orders
 type TradeQuery struct {
 	MerchantID  string `json:"merchant_id" validate:"required"`
 	IncrementID string `json:"increment_id" validate:"required"`

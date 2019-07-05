@@ -4,6 +4,8 @@ import (
 	"net/http"
 )
 
+// Refer to 2.5
+// Refund is used to execute refunding application
 type Refund struct {
 	MerchantID    string  `json:"merchant_id" validate:"required"`
 	IncrementID   string  `json:"increment_id" validate:"required"`

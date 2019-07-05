@@ -5,7 +5,7 @@ This SDK is developed based on [ePayment API document](https://www.kiwifast.com/
 
 
 
-**Checklist**  
+### Checklist
 
 :black_square_button: 2.1 聚合支付接口  
 :black_square_button: 2.2 页面跳转同步通知接口  
@@ -24,12 +24,92 @@ This SDK is developed based on [ePayment API document](https://www.kiwifast.com/
 :black_square_button: 2.14 自定义二维码支付接口  
 
 
-**Install**  
+### Install
 
 ```
 $ go get github.com/OscarZhou/epayments
 ```
 
 
-**Sample**  
+### Notice
 
+1. Your merchant ID binds with a specific currency  
+2. Some fields are not displayed in the API document. For example, `rate` in `AsyncResult`, `TradeQueryResponse` and `RefundQueryResponse`  
+
+
+
+### Sample
+
+#### 2.4  
+
+```
+config := epayments.Config{
+    SignKey:  "YOUR_SIGN_KEY",
+    Endpoint: "https://www.kiwifast.com/api/v1/info/smartpay",
+}
+
+tradeQuery := &epayments.TradeQuery{
+    MerchantID:  "YOUR_MERCHANT_ID",
+    IncrementID: "1101",
+    NonceStr:    "YptpkflFlO",
+    Service:     "create_trade_query",
+}
+
+response, statusCode, err := tradeQuery.Do(config)
+if err != nil {
+    fmt.Printf("result:%v\nhttp code:%d\nmessage:%s\n",response, statusCode, err)
+}
+
+
+``` 
+
+
+#### 2.5 
+
+
+```
+config := epayments.Config{
+    SignKey:  "YOUR_SIGN_KEY",
+    Endpoint: "https://www.kiwifast.com/api/v1/info/smartpay",
+}
+
+refund := &epayments.Refund{
+    MerchantID:   "YOUR_MERCHANT_ID",
+    IncrementID:  "1101",
+    RefundFee:    100.00,
+    RefundReason: "",
+    Currency:     "CNY",
+    NonceStr:     ""YptpkflFlO",",
+    Service:      "create_trade_refund",
+}
+
+response, statusCode, err := refund.Do(config)
+if err != nil {
+    fmt.Printf("result:%v\nhttp code:%d\nmessage:%s\n",response, statusCode, err)
+}
+
+```
+
+
+#### 2.7
+
+```
+config := epayments.Config{
+    SignKey:  "YOUR_SIGN_KEY",
+    Endpoint: "https://www.kiwifast.com/api/v1/info/smartpay",
+}
+
+refundQuery := &epayments.RefundQuery{
+    MerchantID:    "YOUR_MERCHANT_ID",
+    IncrementID:   "1101",
+    RefundTradeNo: "R201655846",
+    NonceStr:      "YptpkflFlO",
+    Service:       "create_trade_refund_query",
+}
+
+response, statusCode, err := tradeQuery.Do(config)
+if err != nil {
+    fmt.Printf("result:%v\nhttp code:%d\nmessage:%s\n",response, statusCode, err)
+}
+
+```

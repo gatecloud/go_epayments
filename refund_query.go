@@ -4,6 +4,8 @@ import (
 	"net/http"
 )
 
+// Refer to 2.7
+// RefundQuery is used to execute refunding query
 type RefundQuery struct {
 	MerchantID    string `json:"merchant_id" validate:"required"`
 	IncrementID   string `json:"increment_id" validate:"required"`

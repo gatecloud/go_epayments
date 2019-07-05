@@ -4,7 +4,8 @@ import (
 	"net/http"
 )
 
-// MiniProgram references 2.12 in API document
+// Refer to 2.12
+// MiniProgram requests the payment by wechat mini program
 type MiniProgram struct {
 	MerchantID      string  `json:"merchant_id" validate:"required"`
 	IncrementID     string  `json:"increment_id" validate:"required"`
