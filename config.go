@@ -120,7 +120,7 @@ func (e *Config) Verify(ver Verifier) (int, error) {
 	fmt.Println("OLD=", signature)
 	fmt.Println("NEW=", ver.GetSignature())
 	if ver.GetSignature() != signature {
-		return http.StatusBadRequest, errors.New("Signature not match")
+		return http.StatusInternalServerError, errors.New("Signature not match")
 	}
 
 	return http.StatusOK, nil
@@ -144,9 +144,9 @@ func toURLParams(sig Signaturer) (string, error) {
 		case reflect.String:
 			s := rfPayment.Field(i).String()
 			v.Set(tag, s)
-		case reflect.Float64:
+		case reflect.Float64, reflect.Float32:
 			f := rfPayment.Field(i).Float()
-			v.Set(tag, fmt.Sprintf("%.2f", f))
+			v.Set(tag, fmt.Sprintf("%g", f))
 		case reflect.Int64:
 			f := rfPayment.Field(i).Int()
 			v.Set(tag, fmt.Sprintf("%d", f))
@@ -193,7 +193,7 @@ func scan(i interface{}, m map[string]string) error {
 				m[tag] = removeSpecialChar(s)
 			case reflect.Float64:
 				f := val.Field(i).Float()
-				m[tag] = fmt.Sprintf("%.2f", f)
+				m[tag] = fmt.Sprintf("%g", f)
 			case reflect.Int64:
 				f := val.Field(i).Int()
 				m[tag] = fmt.Sprintf("%d", f)

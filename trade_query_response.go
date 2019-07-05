@@ -8,6 +8,7 @@ type TradeQueryResponse struct {
 	Subject         string  `json:"subject"`
 	Describe        string  `json:"describe"`
 	TradeNo         string  `json:"trade_no"`
+	Rate            float64 `json:"rate"`
 	CreatedAt       string  `json:"created_at"`
 	GmtPayment      string  `json:"gmt_payment"`
 	TradeStatus     string  `json:"trade_status"`
