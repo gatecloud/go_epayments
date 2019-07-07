@@ -17,7 +17,7 @@ This SDK is developed based on [ePayment API document](https://www.kiwifast.com/
 :white_check_mark: 2.7 退款查询接口  
 :black_square_button: 2.8 交易关闭接口  
 :black_square_button: 2.9 刷卡支付接口  
-:black_square_button: 2.10 汇率查询接口  
+:white_check_mark: 2.10 汇率查询接口  
 :black_square_button: 2.11 聚合二维码支付接口  
 :white_check_mark: 2.12 小程序支付接口  
 :black_square_button: 2.13 聚合APP支付接口  
