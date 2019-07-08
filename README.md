@@ -15,7 +15,7 @@ This SDK is developed based on [ePayment API document](https://www.kiwifast.com/
 :white_check_mark: 2.5 申请退款接口  
 :white_check_mark: 2.6 错误异常响应返回参数  
 :white_check_mark: 2.7 退款查询接口  
-:black_square_button: 2.8 交易关闭接口  
+:white_check_mark: 2.8 交易关闭接口  
 :black_square_button: 2.9 刷卡支付接口  
 :white_check_mark: 2.10 汇率查询接口  
 :black_square_button: 2.11 聚合二维码支付接口  
@@ -34,7 +34,7 @@ $ go get github.com/OscarZhou/epayments
 ### Notice
 
 1. Your merchant ID binds with a specific currency  
-2. Some fields are not displayed in the API document. For example, `rate` in `AsyncResult`, `TradeQueryResponse` and `RefundQueryResponse`  
+2. Some fields are not displayed in the API document. For example, `rate` in `AsyncResult`, `TradeQueryResponse` and `RefundQueryResponse`, please refer to the specific  
 
 
 
