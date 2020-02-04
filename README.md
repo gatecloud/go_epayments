@@ -27,7 +27,7 @@ This SDK is developed based on [ePayment API document](https://www.kiwifast.com/
 ### Install
 
 ```
-$ go get github.com/OscarZhou/epayments
+$ go get github.com/gatecloud/go_epayments
 ```
 
 
